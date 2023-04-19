@@ -14,3 +14,4 @@ python codes/native_entanglement_analysis_v1.1.py 4 1p7l_native.pdb "name CA" ./
 
 THINGS TO NOTE:  
 (1) Make sure there are no missing residues in your PDB. rebuilt them if they are missing. Large sections of missing residues (more than 3 in a row) can cause phantom (not real) entanglements to be found.  
+(2) Make sure there is only one alpha carbon per residue. Many PDBs have multiple conformations of a residue labled locA or locB ect. choose one and delete the others.  
