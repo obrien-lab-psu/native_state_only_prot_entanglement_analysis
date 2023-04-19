@@ -26,6 +26,7 @@ This is a binary file containing a nested dictionary. Each top level key is a pa
 ~~~
 {(256, 296): {'gval_N': 0.671, 'gval_C': -0.074, 'Ncrossings': [125], 'Ccrossings': [], 'Nsurr': [123, 124, 125, 126, 127, 256, 276, 277, 278, 279, 280, 281, 282, 283, 296, 297, 298], 'Csurr': []}}  
 ~~~  
+each element of output dictionary explained  
 ~~~
 (256, 296) native contact 
 ~~~
