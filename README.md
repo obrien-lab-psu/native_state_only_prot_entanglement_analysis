@@ -9,7 +9,7 @@ python codes/native_entanglement_analysis_v1.1.py [1] [2] [3] [4]
 [3] = ref atom selection mask (in double quotes following MDAnalysis atom selection commands)  
 [4] = out_path  
 
-### example cmd line execution:  
+##### example cmd line execution:  
 python codes/native_entanglement_analysis_v1.1.py 4 1p7l_native.pdb "name CA" ./  
 
 ## THINGS TO NOTE:  
@@ -21,11 +21,12 @@ There will be a single pickle file created native_entanglement_analysis_1.1/outp
 
 This is a binary file containing a nested dictionary. Each top level key is a pair of residue IDs from the PDB constituting a native contact and each value is a dictionary with information about the entanglement.  
   
-### for an example entry:  
+##### for an example entry:  
   
 ~~~
 {(256, 296): {'gval_N': 0.671, 'gval_C': -0.074, 'Ncrossings': [125], 'Ccrossings': [], 'Nsurr': [123, 124, 125, 126, 127, 256, 276, 277, 278, 279, 280, 281, 282, 283, 296, 297, 298], 'Csurr': []}}  
 ~~~  
+~~~(256, 296)~~~
 Residues 256 and 296 are in contact forming a loop along the backbone.  
 The N terminal thread has a partial linking value of (gval_N) 0.671 and the C terminal thread has a partial linking value of (gval_C) -0.074 indicating a N terminal entanglement.  
 The point at which the N terminal thread pierces the loop formed by the native contacts (Ncrossings) is residue 125 and there is no C terminal crossings.  
