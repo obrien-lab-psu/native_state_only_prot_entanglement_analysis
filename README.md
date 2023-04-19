@@ -11,3 +11,6 @@ python codes/native_entanglement_analysis_v1.1.py [1] [2] [3] [4]
 
 example cmd line execution:  
 python codes/native_entanglement_analysis_v1.1.py 4 1p7l_native.pdb "name CA" ./  
+
+THINGS TO NOTE:  
+(1) Make sure there are no missing residues in your PDB. rebuilt them if they are missing. Large sections of missing residues (more than 3 in a row) can cause phantom (not real) entanglements to be found.  
