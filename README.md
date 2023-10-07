@@ -17,7 +17,8 @@ python codes/native_entanglement_analysis.py 4 1p7l_native.pdb "name CA" ./
 (2) Make sure there is only one alpha carbon per residue. Many PDBs have multiple conformations of a residue labled locA or locB ect. choose one and delete the others.  
 
 ## OUTPUT file(s)  
-There will be a single pickle file created native_entanglement_analysis_1.1/output/1p7l_native.pkl
+There will be a pickle file created native_entanglement_analysis_1.1/output/1p7l_native.pkl
+There will also be a .csv file created in the same directory with the same informaiton as well for easy viewing
 
 This is a binary file containing a nested dictionary. Each top level key is a pair of residue IDs from the PDB constituting a native contact and each value is a dictionary with information about the entanglement.  
   
