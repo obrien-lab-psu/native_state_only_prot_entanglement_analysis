@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 ################################################################################################################
 script_title='native_entanglement_analysis'
-script_version=1.1
 script_author='Ian Sitarik'
-script_updatelog=f"""Update log for {script_title} version {script_version}
+script_updatelog=f"""Update log for {script_title}
 
                    Date: 08.20.2021
                    Note: Started covertion of topology_anal codes
@@ -139,6 +138,8 @@ script_updatelog=f"""Update log for {script_title} version {script_version}
                     Date: 4.19.2023
                     note: converted to be only native state analysis and no traj analysis. Also simplified output
 
+                    Date: 10.7.2023
+                    note: added csv output for easy user reading
                   """
 
 ################################################################################################################
@@ -157,6 +158,7 @@ import configparser
 import pickle
 from topoly import *
 import more_itertools as mit
+import pandas as pd
 
 ##################################################################################################################
 ### START argument parse ###
@@ -219,17 +221,17 @@ if os.path.exists(f'{out_path}/'):
 else:
     os.makedirs(f'{out_path}/')
 
-if os.path.exists(f'{out_path}{script_title}_{script_version}/'):
-    print(f'{out_path}{script_title}_{script_version}/ does exists and will be used')
+if os.path.exists(f'{out_path}{script_title}/'):
+    print(f'{out_path}{script_title}/ does exists and will be used')
     pass
 else:
-    os.makedirs(f'{out_path}{script_title}_{script_version}/')
+    os.makedirs(f'{out_path}{script_title}/')
 
-if os.path.exists(f'{out_path}{script_title}_{script_version}/output/'):
-    print(f'{out_path}{script_title}_{script_version}/output/ does exists and will be used')
+if os.path.exists(f'{out_path}{script_title}/output/'):
+    print(f'{out_path}{script_title}/output/ does exists and will be used')
     pass
 else:
-    os.makedirs(f'{out_path}{script_title}_{script_version}/output/')
+    os.makedirs(f'{out_path}{script_title}/output/')
 
 ### END dir declaration ###
 
@@ -418,11 +420,28 @@ print('\n######################################## END analysis #################
 
 
 ### output
-outfilename = f'{out_path}{script_title}_{script_version}/output/{outfile_basename}.pkl'
+outfilename = f'{out_path}{script_title}/output/{outfile_basename}.pkl'
 with open(outfilename, "wb") as fh:
     pickle.dump(outdata, fh)
 
 print(f'Saved: {outfilename}')
+
+
+### make a dataframe to output a simple csv file as well for user readin
+df = {'nc': [], 'gval_N': [], 'gval_C': [], 'Ncrossings': [], 'Ccrossings': [], 'Nsurr': [], 'Csurr': []}
+for nc, ent_info in outdata.items():
+    df['nc'] += [nc]
+    df['gval_N'] += [ent_info['gval_N']]
+    df['gval_C'] += [ent_info['gval_C']]
+    df['Ncrossings'] += [ent_info['Ncrossings']]
+    df['Ccrossings'] += [ent_info['Ccrossings']]
+    df['Nsurr'] += [ent_info['Nsurr']]
+    df['Csurr'] += [ent_info['Csurr']]
+df = pd.DataFrame(df)
+print(df)
+outfilename = f'{out_path}{script_title}/output/{outfile_basename}.csv'
+df.to_csv(outfilename, index=False)
+print(f'SAVED: {outfilename}')
 
 ######################################################################################################################
 comp_time=time.time()-start_time
