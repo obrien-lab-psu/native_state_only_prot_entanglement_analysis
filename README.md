@@ -1,56 +1,112 @@
-# Protein entanglement analysis (Native state only)
+# Protein Entanglement Detection
 
-This repository provides the means to analyze a PDB for native entanglements.
+This repository contains a suite of scripts for detecting non-covalent lasso entanglements in protein structures using mass spectrometry data. The primary functionality includes preprocessing PDB files, calculating native entanglements, and identifying crossing residues.
 
-## Usage of code:  
-python codes/native_entanglement_analysis_v1.1.py [1] [2] [3] [4]  
-[1] = num processors  
-[2] = ref PDB or coor file (MDAnalysis supported input coordinate files)  
-[3] = ref atom selection mask (in double quotes following MDAnalysis atom selection commands)  
-[4] = out_path  
+## Table of Contents
 
-##### example cmd line execution:  
-python codes/native_entanglement_analysis.py 4 1p7l_native.pdb "name CA" ./  
+- [Installation](#installation)
+- [Usage](#usage)
+- [Functions](#functions)
+- [Contributing](#contributing)
+- [License](#license)
 
-## THINGS TO NOTE:  
-(1) Make sure there are no missing residues in your PDB. rebuilt them if they are missing. Large sections of missing residues (more than 3 in a row) can cause phantom (not real) entanglements to be found.  
-(2) Make sure there is only one alpha carbon per residue. Many PDBs have multiple conformations of a residue labled locA or locB ect. choose one and delete the others.  
+## Installation
 
-## OUTPUT file(s)  
-There will be a pickle file created native_entanglement_analysis_1.1/output/1p7l_native.pkl
-There will also be a .csv file created in the same directory with the same informaiton as well for easy viewing
+### Prerequisites
 
-This is a binary file containing a nested dictionary. Each top level key is a pair of residue IDs from the PDB constituting a native contact and each value is a dictionary with information about the entanglement.  
-  
-##### for an example entry:  
-  
-~~~
-{(256, 296): {'gval_N': 0.671, 'gval_C': -0.074, 'Ncrossings': [125], 'Ccrossings': [], 'Nsurr': [123, 124, 125, 126, 127, 256, 276, 277, 278, 279, 280, 281, 282, 283, 296, 297, 298], 'Csurr': []}}  
-~~~  
-each element of output dictionary explained  
-~~~
-(256, 296) native contact 
-~~~
-~~~
-gval_N = parital linking value of N terminal thread with loop formed by native contact
-~~~
-~~~
-gval_C = parital linking value of C terminal thread with loop formed by native contact
-~~~
-~~~
-Ncrossings = residue ID of those residues in the N terminus determined to be piercing the plane of the loop
-~~~
-~~~
-Ccrossings = residue ID of those residues in the C terminus determined to be piercing the plane of the loop
-~~~
-~~~
-Nsurr = residue ID of those residues in the N terminus determined to be within 8A of the crossings residues in the N terminus
-~~~
-~~~
-Csurr = residue ID of those residues in the C terminus determined to be within 8A of the crossings residues in the C terminus
-~~~
-So for the example entry above we have the following interpretation.  
-1. Residues 256 and 296 are in contact forming a loop along the backbone.  
-2. The N terminal thread has a partial linking value of (gval_N) 0.671 and the C terminal thread has a partial linking value of (gval_C) -0.074 indicating a N terminal entanglement.  
-3. The point at which the N terminal thread pierces the loop formed by the native contacts (Ncrossings) is residue 125 and there is no C terminal crossings.  
-4. The residues that have alpha carbons within 8A of the crossings residues in the N terminus (Nsurr) are [123, 124, 125, 126, 127, 256, 276, 277, 278, 279, 280, 281, 282, 283, 296, 297, 298].  
+Ensure you have the following Python packages installed:
+
+- `numpy`
+- `pandas`
+- `MDAnalysis`
+- `scipy`
+- `numba`
+- `topoly` (can be installed via pip)
+
+You can install the required packages using:
+
+```sh
+pip install numpy pandas MDAnalysis scipy numba topoly
+```
+
+### Cloning the Repository
+
+Clone this repository to your local machine:
+
+```sh
+git clone https://github.com/yourusername/protein-entanglement-detection.git
+cd protein-entanglement-detection
+```
+
+## Usage
+
+### Preprocessing PDB Files
+
+Preprocess PDB files by removing everything after the last `TER` and handling multiple model instances.
+
+```python
+from your_script import pre_processing_pdb
+
+pre_processing_pdb('example.pdb')
+```
+
+### Calculate Native Entanglements
+
+Calculate and output native lasso-like self-entanglements and missing residues for PDB files and their chains.
+
+```python
+from your_script import calculate_native_entanglements
+
+calculate_native_entanglements('path/to/pdb/file.pdb')
+```
+
+### Command Line Interface
+
+You can also use the provided command line interface:
+
+```sh
+python your_script.py --PDB path/to/pdb --GLN_threshold 0.5
+```
+
+## Functions
+
+### `pre_processing_pdb(pdb_file: str) -> None`
+
+Pre-processes the PDB files by removing everything after the last `TER`. Handles `.pdb`, `.pdb1`, and Alphafold PDBs.
+
+### `helper_dot(Runit: np.ndarray, dR_cross: np.ndarray) -> list`
+
+A Numba-accelerated function to speed up dot product calculations.
+
+### `point_rounding(num: float) -> float`
+
+Rounds numbers to the nearest 0.6.
+
+### `get_entanglements(...) -> dict`
+
+Identifies proteins containing non-covalent lasso entanglements.
+
+### `find_missing_residues(resids: np.ndarray) -> np.ndarray`
+
+Finds missing residues in the PDB file.
+
+### `loop_filter(native_contacts: dict, resids: np.ndarray, missing_res: np.ndarray) -> dict`
+
+Filters loops based on missing residues.
+
+### `find_crossing(coor: np.ndarray, nc_data: dict, resids: np.ndarray) -> dict`
+
+Uses Topoly to find crossings based on partial linking numbers.
+
+### `crossing_filter(entanglements: dict, missing_res: np.ndarray) -> dict`
+
+Filters entanglements based on missing residues near crossings.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
