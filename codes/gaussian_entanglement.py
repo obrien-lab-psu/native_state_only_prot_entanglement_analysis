@@ -303,7 +303,7 @@ def find_crossing(coor: np.ndarray, nc_data: dict, resids: np.ndarray) -> dict:
         # 2. first crossing should be at least 6 residues from the loop
         # 3. first crossing should be at least 5 residues from the closest termini
 
-    data = lasso_type(coor, loop_indices=native_contacts, more_info=True, precision=0, density=0, min_dist=[10, 6, 5])
+    data = lasso_type(coor, loop_indices=native_contacts, more_info=True, density=density, min_dist=[10, 6, 5])
     # high precision, low denisty
 
     for native_contact in native_contacts:
@@ -506,13 +506,20 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Process user specified arguments")
     parser.add_argument("--PDB", type=str, required=True, help="Path to PDB file you want to generate raw entanglments for")
-    parser.add_argument("--GLN_threshold", type=float, required=True, help="Threshold applied to the absoluate value of the GLN to determine if an entanglement is present")
+    parser.add_argument("--GLN_threshold", type=float, required=False, help="Threshold applied to the absoluate value of the GLN to determine if an entanglement is present")
+    parser.add_argument("--topoly_density", type=int, required=False, help="Density of the triangulation of minimal loop surface for determining pericing. Default=0 to speed up calculations but might cause unrealistic crossings in AF structures with large disorderd loops. Increase to 1 if that is the case")
     args = parser.parse_args()
 
-    global pdb_dir
+    # parse some of the default parameters
+    global pdb_dir, density, g_threshold
     pdb_dir = args.PDB
     g_threshold = args.GLN_threshold
-
+    if g_threshold == None:
+        g_threshold = 0.6
+    density = args.topoly_density
+    if density == None:
+        density = 0
+    
     cores = len(os.sched_getaffinity(0))
 
     result_obj = set()

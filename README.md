@@ -16,7 +16,7 @@ This repository contains a suite of scripts for detecting non-covalent lasso ent
 
 Ensure you have the following Python packages installed:
 
-- `numpy`
+- `numpy` (requires 1.2X)
 - `pandas`
 - `MDAnalysis`
 - `scipy`
@@ -65,8 +65,11 @@ calculate_native_entanglements('path/to/pdb/file.pdb')
 You can also use the provided command line interface:
 
 ```sh
-python your_script.py --PDB path/to/pdb --GLN_threshold 0.5
+python your_script.py --PDB path/to/pdb --GLN_threshold 0.6 --topoly_density 1
 ```
+--PDB is the required path to the PDB file to analyze
+--GLN_threshold is an optional parameter to vary the threshold we find real entanglements. Any entanglement with a absolute value of the GLN above this threshold will be used. Default = 0.6
+--topoly_density is an optional parameter to vary the density of triangles when drawing the minimal loop surface to determine peircing events 
 
 ## Functions
 
