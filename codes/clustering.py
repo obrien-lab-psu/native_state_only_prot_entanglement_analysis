@@ -624,9 +624,9 @@ if __name__ == "__main__":
     if organism == 'Human':
         dist_cutoff = 52
     elif organism == 'Ecoli':
-        dist_cutoff == 57
+        dist_cutoff = 57
     elif organism == 'Yeast':
-        dist_cutoff == 49
+        dist_cutoff = 49
     else:
         raise ValueError("Must specify Human, Yeast, or Ecoli")
 
