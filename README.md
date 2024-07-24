@@ -174,8 +174,11 @@ result = cluster_entanglements(('path/to/unmapped_GE_file.txt', 57))
 You can also use the provided command line interface:
 
 ```sh
-python your_script.py --prot_unmapped_GE_file path/to/unmapped_GE_file.txt
+python codes/clustering.py -o clustered_unmapped_GE_HQ/Human_no_pure_slipknots/ --prot_unmapped_GE_file unmapped_GE_HQ/Human_no_pure_slipknots/Q9NR16_AF_A_GE.txt --organism Human
 ```
+-o is the output directory 
+--prot_unmapped_GE_file is the path to the raw entanglement file
+--organism is the organism you want to use which is either Human, Ecoli, or Yeast
 
 ## Functions
 

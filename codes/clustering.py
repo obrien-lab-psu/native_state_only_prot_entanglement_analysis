@@ -100,11 +100,11 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
 
     protein = filename_split[0]
 
-    if f"{protein}_clustered_GE.txt" not in os.listdir("clustered_unmapped_GE/"):
+    if f"{protein}_clustered_GE.txt" not in os.listdir(f"{outpath}"):
         print(f"CLUSTERING ENTANGLEMENTS FOR \033[4m{protein}\033[0m")
     
     else:
-        print(f"\033[4m{protein}\033[0m IS CLUSTERED. PLEASE LOOK IN clustered_unmapped_GE/")
+        print(f"\033[4m{protein}\033[0m IS CLUSTERED. PLEASE LOOK IN {outpath}")
         return
 
     full_entanglement_data = defaultdict(list)
@@ -121,14 +121,14 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
 
     entanglement_partial_g_data = {}
     
-    print(f'Loading unmapped_GE/{GE_file}')
-    #GE_data = np.loadtxt(f"unmapped_GE/{GE_file}", dtype=str, delimiter="\n")
-    GE_data = open(f"unmapped_GE/{GE_file}", "r").readlines()
+    print(f'Loading {GE_file_w_cutoff[0]}')
+    GE_data = open(f"{GE_file_w_cutoff[0]}", "r").readlines()
     GE_data = np.asarray(GE_data)
     #if GE_data.size == 1:
 
     for line in GE_data:
         line = line.split("|")
+        print(line)
 
         if len(line) == 4:
 
@@ -612,16 +612,29 @@ if __name__ == "__main__":
     #unmapped_GE/P00490_1QM5_A_GE.txt
     parser = argparse.ArgumentParser(description="Process user specified arguments")
     parser.add_argument("--prot_unmapped_GE_file", type=str, required=True, help="Path to unmapped_GE file created by gaussian_entanglement.py for the protein you want to cluster")
+    parser.add_argument("-o", "--outpath", type=str, required=True, help="Path to output directory")
+    parser.add_argument("--organism", type=str, required=True, help="Human, Ecoli, Yeast")
     args = parser.parse_args()
 
     input_data = args.prot_unmapped_GE_file
+    outpath = args.outpath
     protein = input_data.split('/')[-1].split('_')[0]
+    organism = args.organism
+
+    if organism == 'Human':
+        dist_cutoff = 52
+    elif organism == 'Ecoli':
+        dist_cutoff == 57
+    elif organism == 'Yeast':
+        dist_cutoff == 49
+    else:
+        raise ValueError("Must specify Human, Yeast, or Ecoli")
 
     global outfile
-    outfile = f'clustered_unmapped_GE/{protein}_clustered_GE.txt'
+    outfile = f'{outpath}/{protein}_clustered_GE.txt'
 
     if os.path.exists(outfile):
         print(f'{outfile} EXISTS. Delete if you wish to cluster')
     else:
-        result = cluster_entanglements((input_data,57))
+        result = cluster_entanglements((input_data,dist_cutoff))
 print(f'NORMAL TERMINATION')
