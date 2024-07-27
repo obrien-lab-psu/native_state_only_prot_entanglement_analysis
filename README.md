@@ -208,3 +208,14 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+
+# Scan PDB for dislufide bonds 
+
+To scane a PDB for disulfide bonds use the following script.
+Residues must have side chain heavy atoms within 4.5A and be atleast 4 residues apart along the primary structure
+ 
+```python
+python codes/scan_disulfide_bonds.py --PDB [path/to/pdb-file or directory containing pdbs]
+```
+It will print to screen the found CYS-CYS bonds in each chain along with their min distance between sidechain heavy atoms
+It will also save a csv of all the contacts found
