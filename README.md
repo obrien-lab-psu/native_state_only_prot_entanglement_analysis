@@ -213,7 +213,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 To scane a PDB for disulfide bonds use the following script.
 Residues must have side chain heavy atoms within 4.5A and be atleast 4 residues apart along the primary structure
- 
+
+### Prerequisites
+
+Ensure you have the following Python packages installed:
+
+- `numpy`
+- `argparse`
+- `os`
+- `sys`
+- `pandas`
+- `Bio`
+
+
 ```python
 python codes/scan_disulfide_bonds.py --PDB [path/to/pdb-file or directory containing pdbs]
 ```

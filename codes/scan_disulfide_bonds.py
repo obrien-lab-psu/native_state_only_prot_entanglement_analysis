@@ -1,18 +1,10 @@
-import itertools
 from Bio import PDB
+import argparse
 import os
-from operator import itemgetter
-from warnings import filterwarnings
 import numpy as np
-import MDAnalysis as mda
 import pandas as pd
-from numba import njit
-from scipy.spatial.distance import pdist, squareform
-from topoly import lasso_type  # used pip
-import re
 import sys
 
-filterwarnings("ignore")
 
 def scan_disulfide_bonds(pdb_file: str) -> None:
 
@@ -80,12 +72,11 @@ def calculate_distance(atom1, atom2):
     return np.sqrt((atom1[0] - atom2[0])**2 + (atom1[1] - atom2[1])**2 + (atom1[2] - atom2[2])**2)
 
 
+
+##########################################################################
 if __name__ == "__main__":
 
-    import multiprocessing as mp
-    import sys,os
-    import argparse
-
+    # parse user arguments
     parser = argparse.ArgumentParser(description="Process user specified arguments")
     parser.add_argument("--PDB", type=str, required=True, help="Path to PDB file you want to generate raw entanglments for")
     args = parser.parse_args()
