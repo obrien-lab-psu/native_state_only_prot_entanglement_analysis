@@ -41,7 +41,7 @@ class BioDataProcessor:
         Setup output directories for storing results.
         """
         #self.outpath = path_to_outdir
-        required_dirs = ['contact_type1_lib', 'contact_type2_lib', 'contact_type3_lib', 'res_features_lib', 'uent_features_lib', 'logs']
+        required_dirs = ['uent_features_lib', 'logs']
         for directory in required_dirs:
             full_path = os.path.join(path_to_outdir, directory)
             print(full_path)
