@@ -94,7 +94,7 @@ if __name__ == "__main__":
         print(f)
         results = scan_disulfide_bonds(f)
         print(results)
-        out = f.replace('.pdb', '_SSheavy_contacts.pdb')
+        out = f.replace('.pdb', '_SSheavy_contacts.csv')
         results.to_csv(out, index=False)
         print(f'SAVED: {out}')
 

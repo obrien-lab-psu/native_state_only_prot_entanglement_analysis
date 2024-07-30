@@ -231,3 +231,41 @@ python codes/scan_disulfide_bonds.py --PDB [path/to/pdb-file or directory contai
 ```
 It will print to screen the found CYS-CYS bonds in each chain along with their min distance between sidechain heavy atoms
 It will also save a csv of all the contacts found
+
+
+# Calculate the entanglement features 
+Calculate various entanglement parameters
+
+### Prerequisites
+
+Ensure you have the following Python packages installed:
+
+- `numpy`
+- `argparse`
+- `os`
+- `sys`
+- `pandas`
+- `mdtraj`
+- `Bio`
+
+usage: EntFeatures.py [-h] -o OUTPATH -p PDB -c CHAIN -l LOG_FILE -t TAG --cluster_file CLUSTER_FILE
+
+Process user specified arguments
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPATH, --outpath OUTPATH
+                        path to outdir
+  -p PDB, --PDB PDB     PDB to process
+  -c CHAIN, --chain CHAIN
+                        Chain of the PDB to use
+  -l LOG_FILE, --log_file LOG_FILE
+                        logging file name
+  -t TAG, --tag TAG     tag for output file name
+  --cluster_file CLUSTER_FILE
+                        path to clustered entanglement file
+
+```python
+python codes/EntFeatures.py --PDB test_pdbs/P0AD61_4YNG_C.pdb -c C -l EntFeatures_P0AD61_4YNG_C.log -t P0AD61 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P0AD61_clustered_GE.txt
+```
+![Entanglement Complexity Definitions](entanglement_complexity_metrics.tif)

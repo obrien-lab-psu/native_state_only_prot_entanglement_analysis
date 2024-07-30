@@ -1,0 +1,3 @@
+python codes/EntFeatures.py --PDB test_pdbs/P0AD61_4YNG_C.pdb -c C -l EntFeatures_P0AD61_4YNG_C.log -t P0AD61 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P0AD61_clustered_GE.txt 
+python codes/EntFeatures.py --PDB test_pdbs/P28631_1JR3_E.pdb -c E -l EntFeatures_P28631_1JR3_E.log -t P28631 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P28631_clustered_GE.txt 
+python codes/EntFeatures.py --PDB test_pdbs/P38054_3NE5_A.pdb -c A -l EntFeatures_P38054_3NE5_A.log -t P38054 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P38054_clustered_GE.txt 
