@@ -268,4 +268,4 @@ options:
 
 python codes/EntFeatures.py --PDB test_pdbs/P0AD61_4YNG_C.pdb -c C -l EntFeatures_P0AD61_4YNG_C.log -t P0AD61 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P0AD61_clustered_GE.txt
 ```
-![Entanglement Complexity Definitions](entanglement_complexity_metrics.tiff)
+![Entanglement Complexity Definitions](entanglement_complexity_metrics.jpg)
