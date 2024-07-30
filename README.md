@@ -248,6 +248,7 @@ Ensure you have the following Python packages installed:
 - `mdtraj`
 - `Bio`
 
+```python
 usage: EntFeatures.py [-h] -o OUTPATH -p PDB -c CHAIN -l LOG_FILE -t TAG --cluster_file CLUSTER_FILE
 
 Process user specified arguments
@@ -265,7 +266,6 @@ options:
   --cluster_file CLUSTER_FILE
                         path to clustered entanglement file
 
-```python
 python codes/EntFeatures.py --PDB test_pdbs/P0AD61_4YNG_C.pdb -c C -l EntFeatures_P0AD61_4YNG_C.log -t P0AD61 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P0AD61_clustered_GE.txt
 ```
-![Entanglement Complexity Definitions](entanglement_complexity_metrics.tif)
+![Entanglement Complexity Definitions](entanglement_complexity_metrics.tiff)
