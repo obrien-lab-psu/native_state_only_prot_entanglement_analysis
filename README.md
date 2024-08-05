@@ -269,3 +269,42 @@ options:
 python codes/EntFeatures.py --PDB test_pdbs/P0AD61_4YNG_C.pdb -c C -l EntFeatures_P0AD61_4YNG_C.log -t P0AD61 -o EntFeatures/ --cluster_file clustered_unmapped_GE/P0AD61_clustered_GE.txt
 ```
 ![Entanglement Complexity Definitions](entanglement_complexity_metrics.jpg)
+
+
+# LASSO regression of entanglement complexity features
+Takes a directory of the entanglement complexity features and two lists of uniprot accession IDs and permutation tests for differences in the means and medians of each group and LASSO regression for feature selection to discriminate between each group. 
+
+### Prerequisites
+
+Ensure you have the following Python packages installed:
+
+- `numpy`
+- `argparse`
+- `os`
+- `sys`
+- `pandas`
+- `sklearn`
+- `glob`
+- `scipy`
+
+```python
+usage: Compare_ent_complexity_metrics_generic.py [-h] -g1 GROUP1_GENE_LIST -g2 GROUP2_GENE_LIST -l LOG_FILE -e UENT_FILES -o OUTPATH -p NUM_PERMUTE
+
+Process user specified arguments
+
+options:
+  -h, --help            show this help message and exit
+  -g1 GROUP1_GENE_LIST, --Group1_gene_list GROUP1_GENE_LIST
+                        path to Group1 gene list used for mask. one uniprot name per line. 
+  -g2 GROUP2_GENE_LIST, --Group2_gene_list GROUP2_GENE_LIST
+                        path to Group2 gene list used for mask. one uniprot name per line.
+  -l LOG_FILE, --log_file LOG_FILE
+                        Path to logging file
+  -e UENT_FILES, --uent_files UENT_FILES
+                        path to unique entanglement files
+  -o OUTPATH, --outpath OUTPATH
+                        path to output directory. will be made if doesnt exist
+  -p NUM_PERMUTE, --num_permute NUM_PERMUTE
+                        Number of permutations
+```
+
