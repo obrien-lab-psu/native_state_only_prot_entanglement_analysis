@@ -1,3 +1,4 @@
 python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P0AD61_4YNG_C_GE.txt
 python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P28631_1JR3_E_GE.txt
 python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P38054_3NE5_A_GE.txt
+python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/AF-Q9ZNE0-F1-model_v4_GE.txt -o clustered_unmapped_GE/ --organism Ecoli
