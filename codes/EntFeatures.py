@@ -246,7 +246,8 @@ class Analyzer:
 
             loopsize = pdb_NCj_core - pdb_NCi_core
             loop_resids = np.arange(pdb_NCi_core, pdb_NCj_core + 1)
-            loop_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain) if atom.residue.resSeq in loop_resids]
+            #loop_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain) if atom.residue.resSeq in loop_resids]
+            loop_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if atom.name == 'CA' if atom.residue.resSeq in loop_resids]
             loop_nearest_neighbors_indices = md.compute_neighbors(self.traj, 0.8, query_indices=loop_alpha_carbon_indices, haystack_indices=haystack_alpha_carbon_indices)[0]
             num_loop_contacting_res = len(loop_nearest_neighbors_indices)
 
@@ -270,8 +271,8 @@ class Analyzer:
             uent_df['unmapped-crossings_wbuff'] += [",".join([str(c) for c in pdb_crossing_res])]
 
             ### Get residues in contact with crossing residues +/- cbuff
-            #cross_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if atom.name == 'CA' if atom.residue.resSeq in pdb_crossing_res]
-            cross_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain) if atom.residue.resSeq in pdb_crossing_res]
+            cross_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if atom.name == 'CA' if atom.residue.resSeq in pdb_crossing_res]
+            #cross_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain) if atom.residue.resSeq in pdb_crossing_res]
             cross_nearest_neighbors_indices = md.compute_neighbors(self.traj, 0.8, query_indices=cross_alpha_carbon_indices, haystack_indices=haystack_alpha_carbon_indices)[0]
             num_cross_nearest_neighbors = len(cross_nearest_neighbors_indices)
 
@@ -324,14 +325,16 @@ class Analyzer:
             ent_core = set(pdb_NC).union(set(pdb_crossing_res))
             ent_core = list(ent_core)
             logging.info(f'ent_core: {ent_core}')
+            print(f'ent_core: {ent_core}')
             
             ## Get alpha carbon indices
             haystack_alpha_carbon_indices = self.traj.top.select('name CA')
-            #print(haystack_alpha_carbon_indices)
+            print(haystack_alpha_carbon_indices)
 
             ent_res = []
             for ent_core_res in ent_core:
-                alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain) and atom.residue.resSeq in [ent_core_res]]
+                #alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if (atom.name == 'CA' and atom.segment_id == chain_ids[chain]) and atom.residue.resSeq in [ent_core_res]]
+                alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if atom.name == 'CA' and atom.residue.resSeq in [ent_core_res]]
 
                 # Calculate nearest neighbors within 8 angstroms based on alpha carbon coordinates
                 nearest_neighbors_indices = md.compute_neighbors(self.traj, 0.8, query_indices=alpha_carbon_indices, haystack_indices=haystack_alpha_carbon_indices, periodic=False)[0]
@@ -353,7 +356,7 @@ class Analyzer:
 
     
             ent_res = set(ent_res).union(set(ent_core))
-            #print(f'ent_res: {ent_res} {len(ent_res)}')
+            print(f'ent_res: {ent_res} {len(ent_res)}')
             logging.info(f'ent_res: {ent_res} {len(ent_res)}')
             uent_df['ent_coverage'] += [len(ent_res)/self.prot_size]
             uent_df['prot_size'] += [self.prot_size]
