@@ -52,8 +52,6 @@ class DataAnalysis:
         'VAL': 'V'}
         
         self.uent_files = glob(os.path.join(uent_files, '*'))
-        print(self.uent_files)
-        quit()
 
         self.keys = ['Gn', 'N_term_thread', 'Gc', 'C_term_thread',
         'loopsize', 'num_zipper_nc', 'perc_bb_loop',

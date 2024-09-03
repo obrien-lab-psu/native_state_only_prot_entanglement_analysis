@@ -109,7 +109,7 @@ def point_rounding(num: float) -> float:
     return rounded_num
 
 def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_file: str, resids: np.ndarray, 
-                      resnames: np.ndarray,resid_index_to_ref_allatoms_idx: dict, ca_coor: np.ndarray) -> dict:
+        resnames: np.ndarray,resid_index_to_ref_allatoms_idx: dict, ca_coor: np.ndarray, resid_index_to_resid: dict) -> dict:
 
     """
     Find proteins containing non-covalent lasso entanglements.
@@ -122,7 +122,10 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
 
     # make native contact contact map
     dist_matrix = squareform(pdist(coor))
-    native_cmap = np.where(dist_matrix <= 4.5, 1, 0) # if true then 1 will appear otherwise zero
+    if Calpha == False:
+        native_cmap = np.where(dist_matrix <= 4.5, 1, 0) # if true then 1 will appear otherwise zero
+    elif Calpha == True:
+        native_cmap = np.where(dist_matrix <= 8, 1, 0) # if true then 1 will appear otherwise zero
     native_cmap = np.triu(native_cmap, k=4) # element below the 4th diagonal starting from middle are all zeros; # protein contact map
 
     num_res = len(resid_index_to_ref_allatoms_idx.keys())
@@ -133,7 +136,8 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
     resid_pairs = list(itertools.product(np.arange(num_res), np.arange(num_res)))
 
     for pair in resid_pairs:
-        if abs(pair[1] - pair[0]) > 4:
+        # check that the resid are greater than 4 apart
+        if abs(resid_index_to_resid[pair[1]] - resid_index_to_resid[pair[0]]) > 4:
             if pair[0] in resid_index_to_ref_allatoms_idx and pair[1] in resid_index_to_ref_allatoms_idx:
                 res1_atoms = resid_index_to_ref_allatoms_idx[pair[0]]
                 res2_atoms = resid_index_to_ref_allatoms_idx[pair[1]]
@@ -145,7 +149,7 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
 
                 if contact > 0:
                     res_ncmap[pair[0], pair[1]] = 1
-            
+                    #print(f'Found contact: {resid_index_to_resid[pair[0]]} & {resid_index_to_resid[pair[1]]}')        
     del native_cmap
     native_cmap = res_ncmap 
 
@@ -213,18 +217,23 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
         rounded_gn_val = point_rounding(np.float64(abs(gn_val)))
 
         if np.abs(rounded_gn_val) >= 1 or np.abs(rounded_gc_val) >= 1:
-            
+            #print(f'({i}, {j}) with gn: {gn_val} and gc: {gc_val}')
             nc_gdict[ (int(i), int(j)) ] = (gn_val, gc_val, rounded_gn_val, rounded_gc_val)
 
     missing_residues = find_missing_residues(resids)
+    #print(f'missing_residues: {missing_residues}')
 
     filtered_nc_gdict = loop_filter(nc_gdict, resids, missing_residues)
+    #print(f'size filtered_nc_gdict after accounting for missing residues: {len(filtered_nc_gdict)}')
 
     entangled_res = find_crossing(ca_coor.tolist(), filtered_nc_gdict, resids)
+    #print(f'entangled_res: {entangled_res}')
 
     filtered_entangled_res = crossing_filter(entangled_res, missing_residues)
+    #print(f'filtered_entangled_res: {filtered_entangled_res}')
 
-    for ent in filtered_entangled_res:
+    disulfide_keys = []
+    for ent_idx, ent in enumerate(filtered_entangled_res):
 
         native_i = ent[0]
         native_j = ent[1]
@@ -234,8 +243,12 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
         nc_j_resname = resnames[np.where(resids == native_j)][0]
 
         if nc_i_resname == "CYS" and nc_j_resname == "CYS":
+            disulfide_keys += [ent]
 
-            return None, []
+    print(f'disulfide_keys: {disulfide_keys} to remove')
+    # delet any keys with disulfide bonds
+    for dk in disulfide_keys:
+        del filtered_entangled_res[dk]
 
     return filtered_entangled_res, missing_residues
 
@@ -303,6 +316,7 @@ def find_crossing(coor: np.ndarray, nc_data: dict, resids: np.ndarray) -> dict:
         # 2. first crossing should be at least 6 residues from the loop
         # 3. first crossing should be at least 5 residues from the closest termini
 
+    # note this functionality doesnt work whats 
     data = lasso_type(coor, loop_indices=native_contacts, more_info=True, density=density, min_dist=[10, 6, 5])
     # high precision, low denisty
 
@@ -374,15 +388,24 @@ def calculate_native_entanglements(pdb_file: str) -> None:
 
     pdb = pdb_file.split('/')[-1].split(".")[0]
 
-    if f"{pdb}_GE.txt" in os.listdir("unmapped_GE/"):
-        print(f"\033[4m{pdb}\033[0m has non-covalent lasso entanglements. Please look in unmapped_GE/")
-        return
+    if Calpha == False:
+        if f"{pdb}_GE.txt" in os.listdir("unmapped_GE/"):
+            print(f"\033[4m{pdb}\033[0m has non-covalent lasso entanglements. Please look in unmapped_GE/")
+            return
+    elif Calpha == True:
+        if f"{pdb}_GE.txt" in os.listdir("unmapped_GE_CA/"):
+            print(f"\033[4m{pdb}\033[0m has non-covalent lasso entanglements. Please look in unmapped_GE/")
+            return
+
 
     ref_univ = mda.Universe(f"{pdb_file}", format="PDB")
 
     print(f"COMPUTING ENTANGLEMENTS FOR \033[4m{pdb}\033[0m")
 
-    ref_allatoms_dups = ref_univ.select_atoms("not name H*")
+    if Calpha == False:
+        ref_allatoms_dups = ref_univ.select_atoms("not name H*")
+    else:
+        ref_allatoms_dups = ref_univ.select_atoms("name CA")
 
     termini_threshold = [5, 5]
 
@@ -410,13 +433,14 @@ def calculate_native_entanglements(pdb_file: str) -> None:
         ref_ca_unique = ref_allatoms_unique.select_atoms("name CA")
 
         resid_index_to_ref_allatoms_idx = {}
+        resid_index_to_resid = {}
+        ref_allatoms_idx_to_resid = {}
         atom_ix = 0
         res_ix = 0
         PDB_resids = ref_ca_unique.resids
         new_atm_idx = []
 
         if len(PDB_resids) == 0 or len(PDB_resids) == 1:
-
             print(f"Skipping over chain {chain} for \033[4m{pdb}\033[0m since chain has only one alpha carbon or none")
             continue
 
@@ -432,21 +456,35 @@ def calculate_native_entanglements(pdb_file: str) -> None:
 
         for atom in ref_allatoms_unique.atoms:
             new_atm_idx.append(atom_ix)
+            ref_allatoms_idx_to_resid[atom_ix] = [atom.resid]
+
             if atom_ix == new_atm_idx[0]:
                 resid = atom.resid
                 resid_index_to_ref_allatoms_idx[res_ix] = [atom_ix]
+                resid_index_to_resid[res_ix] = resid
                 atom_ix += 1
             else:
                 if atom.resid == resid:
                     resid_index_to_ref_allatoms_idx[res_ix] += [atom_ix]
+                    resid_index_to_resid[res_ix] = resid
                     resid = atom.resid
                     atom_ix += 1
                 else:
                     res_ix += 1
                     resid_index_to_ref_allatoms_idx[res_ix] = [atom_ix]
+                    resid_index_to_resid[res_ix] = resid
                     atom_ix += 1
                     resid = atom.resid
-            
+        
+        # Quality check that if Calpha is True there is 1-to-1 mapping of resid index to allatom indexs
+        #print(f'\nresid_index_to_ref_allatoms_idx:\n{resid_index_to_ref_allatoms_idx}')
+        if Calpha == True:
+            for k,v in resid_index_to_ref_allatoms_idx.items():
+                if len(v) != 1:
+                    raise ValueError(f'When Calpha is specified there should only be one resid index for each all atom index: resid index {k} has {v}')
+        #print(f'\nref_allatoms_idx_to_resid:\n{ref_allatoms_idx_to_resid}')
+        #print(f'\nresid_index_to_resid:\n{resid_index_to_resid}')
+
         assert len(new_atm_idx) == np.concatenate(list(resid_index_to_ref_allatoms_idx.values())).size, f"Not enough atom indicies! {pdb_file}"
 
         # x y z cooridnates of chain
@@ -477,14 +515,17 @@ def calculate_native_entanglements(pdb_file: str) -> None:
 
         if PDB_resids.size:
 
-            ent_result, missing_residues = get_entanglements(coor, chain_res, termini_threshold, pdb_file, PDB_resids, resnames, resid_index_to_ref_allatoms_idx, ca_coor)
+            ent_result, missing_residues = get_entanglements(coor, chain_res, termini_threshold, pdb_file, PDB_resids, resnames, resid_index_to_ref_allatoms_idx, ca_coor, resid_index_to_resid)
             
             if ent_result: 
-
-                print(f'WRITING: unmapped_GE/{pdb}_GE.txt')
+                if Calpha == True:
+                    outfile = f'unmapped_GE_CA/{pdb}_GE.txt'
+                else:
+                    outfile = f'unmapped_GE/{pdb}_GE.txt'
+                print(f'WRITING: {outfile}')
                 for ij_gN_gC, crossings in ent_result.items():
                     if crossings.size:
-                        with open(f"unmapped_GE/{pdb}_GE.txt", "a") as f:
+                        with open(outfile, "a") as f:
                             f.write(f"Chain {chain} | ({ij_gN_gC[0]}, {ij_gN_gC[1]}, {crossings}) | {ij_gN_gC[2]} | {ij_gN_gC[3]}\n")
             else:
                 print(f'NO ENT DETECTED for {pdb}')
@@ -507,34 +548,51 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process user specified arguments")
     parser.add_argument("--PDB", type=str, required=True, help="Path to PDB file you want to generate raw entanglments for")
     parser.add_argument("--GLN_threshold", type=float, required=False, help="Threshold applied to the absoluate value of the GLN to determine if an entanglement is present")
+    parser.add_argument("--Calpha", type=str, required=False, help="use CA 8A cutoff instead of defualt 4.5A heavy atom cutoff for native contacts")
     parser.add_argument("--topoly_density", type=int, required=False, help="Density of the triangulation of minimal loop surface for determining pericing. Default=0 to speed up calculations but might cause unrealistic crossings in AF structures with large disorderd loops. Increase to 1 if that is the case")
     args = parser.parse_args()
+    print(args)
 
     # parse some of the default parameters
-    global pdb_dir, density, g_threshold
+    global pdb_dir, density, g_threshold, Calpha
     pdb_dir = args.PDB
+
     g_threshold = args.GLN_threshold
     if g_threshold == None:
         g_threshold = 0.6
+
     density = args.topoly_density
     if density == None:
         density = 0
     
+    Calpha = args.Calpha
+    if Calpha == None:
+        Calpha = False
+    else:
+        if Calpha == 'True':
+            Calpha = True
+        else:
+            Calpha = False
+    
+    print(f'pdb_dir: {pdb_dir}')
+    print(f'g_threshold: {g_threshold}')
+    print(f'density: {density}')
+    print(f'Calpha: {Calpha}')
+
     cores = len(os.sched_getaffinity(0))
 
     result_obj = set()
 
-    directories = {"unmapped_GE", "unmapped_missing_residues", "Before_TER_PDBs", "clustered_unmapped_GE"}
+    if Calpha == True:
+        directories = {"unmapped_GE_CA", "unmapped_missing_residues", "Before_TER_PDBs", "clustered_unmapped_GE"}
+    else:
+        directories = {"unmapped_GE", "unmapped_missing_residues", "Before_TER_PDBs", "clustered_unmapped_GE"}
 
     folder_exists = set(os.listdir("."))
 
     for folder in directories:
         if folder not in folder_exists:
             os.mkdir(f"{os.getcwd()}/{folder}") 
-
-    #for pdbs in os.listdir("PDBs/"):
-
-    #    pre_processing_pdb(pdbs) 
 
     if os.path.isdir(pdb_dir):
         input_data = [f'{pdb_dir}{f}' for f in os.listdir(f"{pdb_dir}")]

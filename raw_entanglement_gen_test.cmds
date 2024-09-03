@@ -1,4 +1,9 @@
-python codes/gaussian_entanglement.py --PDB test_pdbs/P0AD61_4YNG_C.pdb --GLN_threshold 0.6
-python codes/gaussian_entanglement.py --PDB test_pdbs/P28631_1JR3_E.pdb --GLN_threshold 0.6
-python codes/gaussian_entanglement.py --PDB test_pdbs/P38054_3NE5_A.pdb --GLN_threshold 0.6
-python codes/gaussian_entanglement.py --PDB test_pdbs/AF-Q9ZNE0-F1-model_v4.pdb 
+python codes/gaussian_entanglement.py --PDB test_pdbs/P0AD61_4YNG_C.pdb --GLN_threshold 0.6 --Calpha False
+python codes/gaussian_entanglement.py --PDB test_pdbs/P28631_1JR3_E.pdb --GLN_threshold 0.6 --Calpha False
+python codes/gaussian_entanglement.py --PDB test_pdbs/P38054_3NE5_A.pdb --GLN_threshold 0.6 --Calpha False
+python codes/gaussian_entanglement.py --PDB test_pdbs/AF-Q9ZNE0-F1-model_v4.pdb --Calpha False
+
+python codes/gaussian_entanglement.py --PDB test_pdbs/P0AD61_4YNG_C.pdb --GLN_threshold 0.6 --Calpha True
+python codes/gaussian_entanglement.py --PDB test_pdbs/P28631_1JR3_E.pdb --GLN_threshold 0.6 --Calpha True
+python codes/gaussian_entanglement.py --PDB test_pdbs/P38054_3NE5_A.pdb --GLN_threshold 0.6 --Calpha True
+python codes/gaussian_entanglement.py --PDB test_pdbs/AF-Q9ZNE0-F1-model_v4.pdb --Calpha True

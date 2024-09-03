@@ -630,6 +630,10 @@ if __name__ == "__main__":
     else:
         raise ValueError("Must specify Human, Yeast, or Ecoli")
 
+    if not os.path.exists(outpath):
+        os.mkdir(outpath)
+        print(f'Made: {outpath}')
+
     global outfile
     outfile = f'{outpath}/{protein}_clustered_GE.txt'
 
