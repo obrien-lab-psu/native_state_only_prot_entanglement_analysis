@@ -90,12 +90,12 @@ Filters entanglements based on missing residues near crossings.
 
 ### Raw entanglement file
 
-File containing 1 entanglement per line separated by "|". 
-[0] ChainID 
-[1] (loop native contact residue i, loop native contact residue j, crossings) 
-[2] Gn 
-[3] Gc 
-[4] Whether a disulfide bond was identified at the native contact (two SG atoms within 2.2 A) 
+File containing 1 entanglement per line separated by "|".  
+[0] ChainID  
+[1] (loop native contact residue i, loop native contact residue j, crossings)  
+[2] Gn  
+[3] Gc  
+[4] Whether a disulfide bond was identified at the native contact (two SG atoms within 2.2 A)  
 
 ## Contributing
 
@@ -196,14 +196,14 @@ Clusters entanglements based on residue crossings and chiralities, and outputs t
 ### Raw entanglement file
 
 File containing 1 entanglement per line separated by "|".  
-[0] ChainID 
-[1] (loop native contact residue i, loop native contact residue j, crossings) representaive entanglement for the cluster 
-[2] Gn 
-[3] Gc 
-[4] number of loop closing contacts 
-[4] ";" separated list of the residueIDs for the loop closing contacts 
-[4] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A) 
-
+[0] ChainID  
+[1] (loop native contact residue i, loop native contact residue j, crossings) representaive entanglement for the cluster  
+[2] Gn  
+[3] Gc  
+[4] number of loop closing contacts  
+[4] ";" separated list of the residueIDs for the loop closing contacts  
+[4] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A)  
+ 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
