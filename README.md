@@ -47,11 +47,11 @@ You can also use the provided command line interface:
 ```sh
 python your_script.py --PDB path/to/pdb --GLN_threshold 0.6 --topoly_density 1 --Calpha False
 ```
---PDB is the required path to the PDB file to analyze
---GLN_threshold is an optional parameter to vary the threshold we find real entanglements. Any entanglement with a absolute value of the GLN above this threshold will be used. Default = 0.6
---topoly_density is an optional parameter to vary the density of triangles when drawing the minimal loop surface to determine peircing events 
---Calpha is a True or False optional parameter to use either 8A between alpha carbons for native contacts or 4.5A between heavy atoms (False, default)
-
+--PDB is the required path to the PDB file to analyze  
+--GLN_threshold is an optional parameter to vary the threshold we find real entanglements. Any entanglement with a absolute value of the GLN above this threshold will be used. Default = 0.6  
+--topoly_density is an optional parameter to vary the density of triangles when drawing the minimal loop surface to determine peircing events   
+--Calpha is a True or False optional parameter to use either 8A between alpha carbons for native contacts or 4.5A between heavy atoms (False, default)  
+  
 ## Functions
 
 ### `pre_processing_pdb(pdb_file: str) -> None`
@@ -167,9 +167,9 @@ You can also use the provided command line interface:
 ```sh
 python codes/clustering.py -o clustered_unmapped_GE_HQ/Human_no_pure_slipknots/ --prot_unmapped_GE_file unmapped_GE_HQ/Human_no_pure_slipknots/Q9NR16_AF_A_GE.txt --organism Human
 ```
--o is the output directory 
---prot_unmapped_GE_file is the path to the raw entanglement file
---organism is the organism you want to use which is either Human, Ecoli, or Yeast
+-o is the output directory  
+--prot_unmapped_GE_file is the path to the raw entanglement file  
+--organism is the organism you want to use which is either Human, Ecoli, or Yeast  
 
 ## Functions
 
