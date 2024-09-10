@@ -1,0 +1,37 @@
+CLUSTERING ENTANGLEMENTS FOR [4mA0A075B6I1[0m
+Loading unmapped_GE/A0A075B6I1_GE.txt
+['Chain A ', " (70, 116, ['-54']) ", ' -0.6970696370738431 ', ' 0 ', ' CCbond-False\n']
+Step 1 results
+('Chain A', '-54') [(70, 116)]
+CCBonds: []
+
+# Step 2
+Step 2 results
+0 (1, 70, 116, '-54', '70-116')
+
+# Step 2b
+
+Step 2b results
+0 [(1, 70, 116, '-54', '70-116')]
+
+### Update entanglement dict with those that got merged
+Number of merged pairs: 0
+
+### merge ents to final and reform ent_data
+Results after adding those that got merged to each representative entanglement
+(1, 70, 116, '-54', '70-116')
+
+# Step 3
+Step 3 results
+(1, 70, 116, '-54', '70-116')
+
+# Step 4 prep
+# Step 4 prep results
+(1, 70, 116, '-54', '70-116')
+
+# Step 4
+
+Step 5: Output file
+Chain A|(70, 116, '-54')|-0.69707|0.00000|1|70-116|False
+SAVED: clustered_unmapped_GE//A0A075B6I1_clustered_GE.txt
+NORMAL TERMINATION

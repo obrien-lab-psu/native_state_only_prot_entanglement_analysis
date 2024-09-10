@@ -40,36 +40,17 @@ cd protein-entanglement-detection
 
 ## Usage
 
-### Preprocessing PDB Files
-
-Preprocess PDB files by removing everything after the last `TER` and handling multiple model instances.
-
-```python
-from your_script import pre_processing_pdb
-
-pre_processing_pdb('example.pdb')
-```
-
-### Calculate Native Entanglements
-
-Calculate and output native lasso-like self-entanglements and missing residues for PDB files and their chains.
-
-```python
-from your_script import calculate_native_entanglements
-
-calculate_native_entanglements('path/to/pdb/file.pdb')
-```
-
 ### Command Line Interface
 
 You can also use the provided command line interface:
 
 ```sh
-python your_script.py --PDB path/to/pdb --GLN_threshold 0.6 --topoly_density 1
+python your_script.py --PDB path/to/pdb --GLN_threshold 0.6 --topoly_density 1 --Calpha False
 ```
 --PDB is the required path to the PDB file to analyze
 --GLN_threshold is an optional parameter to vary the threshold we find real entanglements. Any entanglement with a absolute value of the GLN above this threshold will be used. Default = 0.6
 --topoly_density is an optional parameter to vary the density of triangles when drawing the minimal loop surface to determine peircing events 
+--Calpha is a True or False optional parameter to use either 8A between alpha carbons for native contacts or 4.5A between heavy atoms (False, default)
 
 ## Functions
 
@@ -105,6 +86,17 @@ Uses Topoly to find crossings based on partial linking numbers.
 
 Filters entanglements based on missing residues near crossings.
 
+## Output
+
+### Raw entanglement file
+
+File containing 1 entanglement per line separated by "|". 
+[0] ChainID
+[1] (loop native contact residue i, loop native contact residue j, crossings)
+[2] Gn
+[3] Gc
+[4] Whether a disulfide bond was identified at the native contact (two SG atoms within 2.2 A)
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
@@ -115,7 +107,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
  
  
-
 # Protein Entanglement Clustering (clustering.py)
 
 This repository contains scripts for clustering non-covalent lasso entanglements in protein structures. The primary functionality includes calculating distances between entanglements, identifying minimal loops, and spatially clustering entanglements based on residue crossings and chiralities.
@@ -199,6 +190,19 @@ Clusters entanglements based on residue crossings and chiralities, and outputs t
 - `find_crossing_residues()`: Identifies crossing residues in the protein structure.
 - `filter_loops()`: Filters loops based on certain criteria.
 - `calculate_distances()`: Calculates distances between residue sets.
+
+## Output
+
+### Raw entanglement file
+
+File containing 1 entanglement per line separated by "|". 
+[0] ChainID
+[1] (loop native contact residue i, loop native contact residue j, crossings) representaive entanglement for the cluster
+[2] Gn
+[3] Gc
+[4] number of loop closing contacts
+[4] ";" separated list of the residueIDs for the loop closing contacts
+[4] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A)
 
 ## Contributing
 

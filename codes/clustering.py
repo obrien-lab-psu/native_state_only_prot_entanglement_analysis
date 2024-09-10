@@ -126,11 +126,14 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
     GE_data = np.asarray(GE_data)
     #if GE_data.size == 1:
 
+    ## parse the entanglement file and
+    ## get those native contacts that are disulfide bonds
+    CCBonds = []
     for line in GE_data:
         line = line.split("|")
         print(line)
 
-        if len(line) == 4:
+        if len(line) == 5:
 
             chain = line[0].strip()
 
@@ -148,9 +151,19 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
             grouped_entanglement_data[(chain, *reformat_cr)].append((native_contact_i, native_contact_j))
 
             entanglement_partial_g_data[(native_contact_i, native_contact_j, *reformat_cr)] = (line[2].strip(), line[3].strip())
+
+            # CCbond status
+            CCBond = line[4].strip('\n')
+            CCBond = CCBond.replace(' CCbond-', '')
+            if CCBond == 'True':
+                CCBonds += [(native_contact_i, native_contact_j)]
+
+            
     print(f'Step 1 results')
     for k,v in grouped_entanglement_data.items():
         print(k,v)
+    print(f'CCBonds: {CCBonds}')
+
 
     # Step 2
     print(f'\n# Step 2')
@@ -571,7 +584,7 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
     print(f'\nStep 5: Output file')
     with open(outfile, "w") as f:
 
-        f.write(f'chain|ijr|gn|gc|num_contacts|contacts\n')
+        f.write(f'chain|ijr|gn|gc|num_contacts|contacts|CCBond\n')
         for chain_counter, ijrs in rep_chain_ent.items():
 
             chain, counter = chain_counter.split("_")
@@ -586,7 +599,15 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                 gn = float(gn)
                 gc = float(gc)
 
-                line = f"{chain}|{(int(ijr[1]), int(ijr[2]), *ijr[3:-1])}|{gn:.5f}|{gc:.5f}|{num_nc}|{ijr[-1]}"
+                ## check for disulfide bonds
+                CCBond_flag = False
+                for CCBond in CCBonds:
+                    check1 = f'{CCBond[0]}-{CCBond[1]}' 
+                    check2 = f'{CCBond[1]}-{CCBond[0]}'
+                    if check1 in ijr[-1] or check2 in ijr[-1]:
+                        CCBond_flag = True
+
+                line = f"{chain}|{(int(ijr[1]), int(ijr[2]), *ijr[3:-1])}|{gn:.5f}|{gc:.5f}|{num_nc}|{ijr[-1]}|{CCBond_flag}"
                 print(line)
                 f.write(f"{line}\n")
     print(f'SAVED: {outfile}')

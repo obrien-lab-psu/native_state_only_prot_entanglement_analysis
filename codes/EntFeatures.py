@@ -198,8 +198,8 @@ class Analyzer:
 
             #########################################################################
             ## get Gn and Gc and if it is present the cluster size
-            if len(line) == 6:
-                num_zipper_nc = int(line[-2])
+            if len(line) == 7:
+                num_zipper_nc = int(line[-3])
             else:
                 num_zipper_nc = np.nan
             Gn = float(line[2])

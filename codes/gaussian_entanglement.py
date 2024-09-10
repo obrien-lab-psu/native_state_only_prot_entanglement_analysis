@@ -1,4 +1,6 @@
 import itertools
+from Bio.PDB import PDBParser
+from Bio.PDB.DSSP import DSSP
 import os
 from operator import itemgetter
 from warnings import filterwarnings
@@ -232,24 +234,6 @@ def get_entanglements(coor: np.ndarray, l: int, termini_threshold: list, pdb_fil
     filtered_entangled_res = crossing_filter(entangled_res, missing_residues)
     #print(f'filtered_entangled_res: {filtered_entangled_res}')
 
-    disulfide_keys = []
-    for ent_idx, ent in enumerate(filtered_entangled_res):
-
-        native_i = ent[0]
-        native_j = ent[1]
-
-        nc_i_resname = resnames[np.where(resids == native_i)][0]
-
-        nc_j_resname = resnames[np.where(resids == native_j)][0]
-
-        if nc_i_resname == "CYS" and nc_j_resname == "CYS":
-            disulfide_keys += [ent]
-
-    print(f'disulfide_keys: {disulfide_keys} to remove')
-    # delet any keys with disulfide bonds
-    for dk in disulfide_keys:
-        del filtered_entangled_res[dk]
-
     return filtered_entangled_res, missing_residues
 
 
@@ -379,6 +363,37 @@ def crossing_filter(entanglements: dict, missing_res: np.ndarray) -> dict:
 
     return filtered_entanglements
 
+
+def check_disulfideBonds(pdb_file): 
+
+    # Parse the PDB structure
+    parser = PDBParser()
+    structure = parser.get_structure('protein', pdb_file)
+
+    disulfide_bonds = []
+    # Iterate over residues and identify disulfide bonds
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                if residue.get_resname() == 'CYS':
+                    sg_atom = residue['SG']
+                    # Check for disulfide bonds with distance threshold (e.g., <2.2 Å)
+                    for model2 in structure:
+                        for chain2 in model2:
+                            for residue2 in chain2:
+                                if residue2.get_resname() == 'CYS' and residue != residue2:
+                                    sg_atom2 = residue2['SG']
+                                    distance = sg_atom - sg_atom2
+                                    if distance < 2.2:
+                                        print(f"Disulfide bond between {residue} and {residue2} at distance {distance:.2f} Å")
+                                        i,j = residue.get_id()[1], residue2.get_id()[1] 
+                                        
+                                        if (i,j) not in disulfide_bonds and (j,i) not in disulfide_bonds:
+                                            disulfide_bonds += [(i,j)]
+    return disulfide_bonds 
+
+
+
 def calculate_native_entanglements(pdb_file: str) -> None:
 
     """
@@ -401,6 +416,12 @@ def calculate_native_entanglements(pdb_file: str) -> None:
     ref_univ = mda.Universe(f"{pdb_file}", format="PDB")
 
     print(f"COMPUTING ENTANGLEMENTS FOR \033[4m{pdb}\033[0m")
+    
+    ### Find any disulfide bonds
+    print(f'Checking for disulfide bonds')
+    disulfide_bonds = check_disulfideBonds(pdb_file)
+    print(f'disulfide_bonds: {disulfide_bonds}')
+
 
     if Calpha == False:
         ref_allatoms_dups = ref_univ.select_atoms("not name H*")
@@ -516,6 +537,7 @@ def calculate_native_entanglements(pdb_file: str) -> None:
         if PDB_resids.size:
 
             ent_result, missing_residues = get_entanglements(coor, chain_res, termini_threshold, pdb_file, PDB_resids, resnames, resid_index_to_ref_allatoms_idx, ca_coor, resid_index_to_resid)
+            print(f'Number of ENTs found: {len(ent_result)}')
             
             if ent_result: 
                 if Calpha == True:
@@ -524,9 +546,18 @@ def calculate_native_entanglements(pdb_file: str) -> None:
                     outfile = f'unmapped_GE/{pdb}_GE.txt'
                 print(f'WRITING: {outfile}')
                 for ij_gN_gC, crossings in ent_result.items():
+                    print(ij_gN_gC)
+                    i,j = ij_gN_gC[0], ij_gN_gC[1]
+
+                    if (i,j) in disulfide_bonds or (j,i) in disulfide_bonds:
+                        CCbond = True
+                    else:
+                        CCbond = False
+
                     if crossings.size:
                         with open(outfile, "a") as f:
-                            f.write(f"Chain {chain} | ({ij_gN_gC[0]}, {ij_gN_gC[1]}, {crossings}) | {ij_gN_gC[2]} | {ij_gN_gC[3]}\n")
+                            f.write(f"Chain {chain} | ({ij_gN_gC[0]}, {ij_gN_gC[1]}, {crossings}) | {ij_gN_gC[2]} | {ij_gN_gC[3]} | CCbond-{CCbond}\n")
+
             else:
                 print(f'NO ENT DETECTED for {pdb}')
             

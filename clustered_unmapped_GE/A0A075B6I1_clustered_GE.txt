@@ -1,0 +1,2 @@
+chain|ijr|gn|gc|num_contacts|contacts|CCBond
+Chain A|(70, 116, '-54')|-0.69707|0.00000|1|70-116|False

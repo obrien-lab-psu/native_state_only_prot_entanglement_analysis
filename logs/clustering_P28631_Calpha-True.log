@@ -1,0 +1,47 @@
+Warning: The unmapped_GE filenames should only contain a single "_" character:  P28631_1JR3_E_GE.txt
+CLUSTERING ENTANGLEMENTS FOR [4mP28631[0m
+Loading unmapped_GE_CA/P28631_1JR3_E_GE.txt
+['Chain E ', " (25, 135, ['+142']) ", ' -0.01842928239786814 ', ' 0.7820156033846525 ', ' CCbond-False\n']
+['Chain E ', " (26, 132, ['+142']) ", ' -0.02095057687045463 ', ' 0.9168011515604383 ', ' CCbond-False\n']
+['Chain E ', " (37, 164, ['+29']) ", ' 0.6432384015067717 ', ' 0.027514042809033582 ', ' CCbond-False\n']
+Step 1 results
+('Chain E', '+142') [(25, 135), (26, 132)]
+('Chain E', '+29') [(37, 164)]
+CCBonds: []
+
+# Step 2
+Step 2 results
+0 (2, 26, 132, '+142', '25-135;26-132')
+1 (1, 37, 164, '+29', '37-164')
+
+# Step 2b
+
+Step 2b results
+0 [(2, 26, 132, '+142', '25-135;26-132')]
+1 [(1, 37, 164, '+29', '37-164')]
+
+### Update entanglement dict with those that got merged
+Number of merged pairs: 0
+
+### merge ents to final and reform ent_data
+Results after adding those that got merged to each representative entanglement
+(2, 26, 132, '+142', '25-135;26-132')
+(1, 37, 164, '+29', '37-164')
+
+# Step 3
+Step 3 results
+(2, 26, 132, '+142', '25-135;26-132')
+(1, 37, 164, '+29', '37-164')
+
+# Step 4 prep
+# Step 4 prep results
+(2, 26, 132, '+142', '25-135;26-132')
+(1, 37, 164, '+29', '37-164')
+
+# Step 4
+
+Step 5: Output file
+Chain E|(26, 132, '+142')|-0.02095|0.91680|2|25-135;26-132|False
+Chain E|(37, 164, '+29')|0.64324|0.02751|1|37-164|False
+SAVED: clustered_unmapped_GE_CA//P28631_clustered_GE.txt
+NORMAL TERMINATION
