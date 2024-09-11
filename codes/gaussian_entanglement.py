@@ -376,13 +376,19 @@ def check_disulfideBonds(pdb_file):
         for chain in model:
             for residue in chain:
                 if residue.get_resname() == 'CYS':
-                    sg_atom = residue['SG']
+                    if 'SG' in residue:
+                        sg_atom = residue['SG']
+                    else:
+                        continue
                     # Check for disulfide bonds with distance threshold (e.g., <2.2 Å)
                     for model2 in structure:
                         for chain2 in model2:
                             for residue2 in chain2:
                                 if residue2.get_resname() == 'CYS' and residue != residue2:
-                                    sg_atom2 = residue2['SG']
+                                    if 'SG' in residue2:
+                                        sg_atom2 = residue2['SG']
+                                    else:
+                                        continue
                                     distance = sg_atom - sg_atom2
                                     if distance < 2.2:
                                         print(f"Disulfide bond between {residue} and {residue2} at distance {distance:.2f} Å")
