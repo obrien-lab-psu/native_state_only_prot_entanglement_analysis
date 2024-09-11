@@ -1,1 +1,0 @@
-python codes/scan_disulfide_bonds.py --PDB test_pdbs/P28631_1JR3_E.pdb 
