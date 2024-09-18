@@ -124,10 +124,10 @@ class Analyzer:
                     'N_term_thread':[],
                     'Gc':[],
                     'C_term_thread':[],
-                    'unmapped-NC':[],
-                    'unmapped-NC_wbuff':[],
-                    'unmapped-crossings':[], 
-                    'unmapped-crossings_wbuff':[], 
+                    'NC':[],
+                    'NC_wbuff':[],
+                    'crossings':[], 
+                    'crossings_wbuff':[], 
                     'loopsize': [], 
                     'num_zipper_nc':[], 
                     'perc_bb_loop':[],
@@ -142,7 +142,8 @@ class Analyzer:
                     'min_C_thread_slippage_right':[], 
                     'prot_size':[], 
                     'ACO':[],
-                    'RCO':[]}
+                    'RCO':[],
+                    'CCBond':[]}
 
         #############################################################################################################################################################################
         ### Load entanglement information if present
@@ -200,13 +201,16 @@ class Analyzer:
             ## get Gn and Gc and if it is present the cluster size
             if len(line) == 7:
                 num_zipper_nc = int(line[-3])
+                CCBond = line[-1]
             else:
                 num_zipper_nc = np.nan
+                CCBond = np.nan
             Gn = float(line[2])
             Gc = float(line[3])
 
+            
             # Calcualte the absolute and relative contact orders
-            range_strings = line[-1].split(';')
+            range_strings = line[-2].split(';')
             loops = [(int(x[0]), int(x[1])) for x in [l.split('-') for l in range_strings]]
             #loops = self.parse_ranges(range_strings)
             #print(loops)
@@ -215,13 +219,14 @@ class Analyzer:
             print(f'loop_sizes: {loop_sizes}')
             ACO = np.sum(loop_sizes)/len(loop_sizes)
             RCO = ACO/self.prot_size
-            print(f'Gn: {Gn} | Gc: {Gc} | num_zipper_nc: {num_zipper_nc} | ACO: {ACO} | RCO: {RCO}')
-            logging.info(f'Gn: {Gn} | Gc: {Gc} | num_zipper_nc: {num_zipper_nc} | ACO: {ACO} | RCO: {RCO}')
+            print(f'Gn: {Gn} | Gc: {Gc} | num_zipper_nc: {num_zipper_nc} | ACO: {ACO} | RCO: {RCO} | CCBond: {CCBond}')
+            logging.info(f'Gn: {Gn} | Gc: {Gc} | num_zipper_nc: {num_zipper_nc} | ACO: {ACO} | RCO: {RCO} | CCBond: {CCBond}')
             uent_df['Gn'] += [Gn]
             uent_df['Gc'] += [Gc]
             uent_df['num_zipper_nc'] += [num_zipper_nc]
             uent_df['ACO'] += [ACO]
             uent_df['RCO'] += [RCO]
+            uent_df['CCBond'] += [CCBond]
 
 
             #########################################################################
@@ -241,8 +246,8 @@ class Analyzer:
 
             logging.info(f'pdb_NC: {pdb_NC}')
             logging.info(f'pdb_NC_core: {pdb_NC_core}')
-            uent_df['unmapped-NC'] += [",".join([str(r) for r in pdb_NC_core])]
-            uent_df['unmapped-NC_wbuff'] += [",".join([str(r) for r in pdb_NC])]
+            uent_df['NC'] += [", ".join([str(r) for r in pdb_NC_core])]
+            uent_df['NC_wbuff'] += [", ".join([str(r) for r in pdb_NC])]
 
             loopsize = pdb_NCj_core - pdb_NCi_core
             loop_resids = np.arange(pdb_NCi_core, pdb_NCj_core + 1)
@@ -267,8 +272,8 @@ class Analyzer:
 
             pdb_crossing_list += pdb_crossing_res
             pdb_crossing_core_list += pdb_crossing_res_core
-            uent_df['unmapped-crossings'] += [",".join([str(c) for c in pdb_crossing_res_core])]
-            uent_df['unmapped-crossings_wbuff'] += [",".join([str(c) for c in pdb_crossing_res])]
+            uent_df['crossings'] += [", ".join([str(c) for c in pdb_crossing_res_core])]
+            uent_df['crossings_wbuff'] += [", ".join([str(c) for c in pdb_crossing_res])]
 
             ### Get residues in contact with crossing residues +/- cbuff
             cross_alpha_carbon_indices = [atom.index for atom in self.traj.top.atoms if atom.name == 'CA' if atom.residue.resSeq in pdb_crossing_res]

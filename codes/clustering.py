@@ -124,18 +124,25 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
     print(f'Loading {GE_file_w_cutoff[0]}')
     GE_data = open(f"{GE_file_w_cutoff[0]}", "r").readlines()
     GE_data = np.asarray(GE_data)
-    #if GE_data.size == 1:
 
+
+### STEP 1 INITAL LOADING AND MERGING ################################################################################################################
+    ############################################################################################
     ## parse the entanglement file and
     ## get those native contacts that are disulfide bonds
     CCBonds = []
+    num_raw_ents = {}
     for line in GE_data:
         line = line.split("|")
         print(line)
-
         if len(line) == 5:
 
             chain = line[0].strip()
+            # keep track of number of raw ents for QC purposes
+            if chain not in num_raw_ents:
+                num_raw_ents[chain] = 1
+            else:
+                num_raw_ents[chain] += 1
 
             native_contact_i, native_contact_j, crossing_res = line[1].split(",")
 
@@ -146,6 +153,8 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
             reformat_cr = crossing_res.replace(")", "").strip()[1:-1].replace("'", "").split()
 
             reformat_cr = sorted(reformat_cr, key = lambda x: int(re.split("\\+|-", x, maxsplit= 1)[1]))
+            print(native_contact_i, native_contact_j, reformat_cr)
+
 
             # Step 1 and 1b
             grouped_entanglement_data[(chain, *reformat_cr)].append((native_contact_i, native_contact_j))
@@ -158,15 +167,19 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
             if CCBond == 'True':
                 CCBonds += [(native_contact_i, native_contact_j)]
 
-            
+    print(f'num_raw_ents: {num_raw_ents}')        
+
     print(f'Step 1 results')
+    Step1_QC_counter = 0
     for k,v in grouped_entanglement_data.items():
         print(k,v)
+        Step1_QC_counter += len(v)
     print(f'CCBonds: {CCBonds}')
 
-
-    # Step 2
-    print(f'\n# Step 2')
+### STEP 2 ################################################################################################################
+    ############################################################################################
+    # Step 2 Get the minimal loop encompassing each set of unique crossings
+    print(f'\n# Step 2a')
     for chain_cr, loops in grouped_entanglement_data.items():
 
         chain = chain_cr[0]
@@ -182,20 +195,33 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
         minimum_loop_nc_i, minimum_loop_nc_j = loops[minimum_loop_length_index]
 
         ent_data[chain].append((len(loops), minimum_loop_nc_i, minimum_loop_nc_j, *crossings, ';'.join(['-'.join([str(loop[0]), str(loop[1])]) for loop in loops])))
-    print(f'Step 2 results')
-    for chain, ents in ent_data.items():
-        for ent_i, ent in enumerate(ents):
-            print(ent_i, ent)
 
-    # Step 2b
+    print(f'Step 2a results')
+    for chain, ents in ent_data.items():
+        Step2a_QC_counter = 0
+        for ent_i, ent in enumerate(ents):
+            print(chain, ent_i, ent)
+            Step2a_QC_counter += ent[0]
+
+        ## QC that the number of tracked entanglements after step 2a is still valid
+        print(f'Step2a_QC_counter: {Step2a_QC_counter} should = {num_raw_ents[chain]}')
+        if Step2a_QC_counter != num_raw_ents[chain]:
+            raise ValueError(f'The number of tracked entaglements after Step 2a {Step2a_QC_counter} != {num_raw_ents[chain]}')
+
+    ############################################################################################
+    # Step 2b: 
     print(f'\n# Step 2b')
     merged_ents = []
     for chain, ents in ent_data.items():
+        orig_ents = ents.copy()
         comb_ents = itertools.combinations(ents, 2)
 
         # for each pair of ents
         for each_ent_pair in comb_ents:
             #print(f'\nAnalyzing pair: {each_ent_pair}')
+            if each_ent_pair[0] == each_ent_pair[1]:
+                print(f'Ents are the same: {each_ent_pair}')
+                continue
 
             distance_thresholds = []
 
@@ -216,6 +242,11 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
             
             
             # if any of those distances is less than 3 and the number of crossings is not the same and ij in range of kl
+            dist_check = np.any(cr_dist_same_chiral <= 3)
+            loop_check = check_step_ij_kl_range(ent1, ent2)
+            diff_cross_size_check = len(cr1) != len(cr2)
+            #print(dist_check, loop_check, diff_cross_size_check)
+
             if np.any(cr_dist_same_chiral <= 3) and len(cr1) != len(cr2) and check_step_ij_kl_range(ent1, ent2):
                 #print(f'\nAnalyzing pair: {each_ent_pair}')
                 #print(f'step 2b conditions met')
@@ -228,6 +259,7 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
 
                 min_max_loop_base_range = set(range(minumum_loop_base, maximum_loop_base + 1))
 
+                # if the crossings are not within the min max loop range covering both entanglements
                 if not min_max_loop_base_range.intersection(all_crossings):
 
                     fewer_cr = min(cr1, cr2, key = len)
@@ -289,6 +321,7 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
 
                         min_ent = min(ent1, ent2, key = len)
                         max_ent = max(ent1, ent2, key = len)
+                        #print(f'ent1: {ent1} | ent2: {ent2}')
                         #print(f'min_ent: {min_ent}')
                         #print(f'max_ent: {max_ent}')
 
@@ -301,7 +334,8 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                             #del ents[ents.index(max_ent)]
 
                             merged_ents += [(max_ent, min_ent)]
-
+                            if max_ent == min_ent:
+                                quit()
 
     
     print(f'\nStep 2b results')
@@ -314,7 +348,8 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
         ### Update entanglement list with those that got merged
         print(f'\n### Update entanglement dict with those that got merged\nNumber of merged pairs: {len(merged_ents)}')
         while len(merged_ents) != 0:
-            #print(f'# merged_ents: {len(merged_ents)}')
+            pre_num_merged = len(merged_ents)
+            #print(f'# merged_ents: {pre_num_merged}')
             for m_ent in merged_ents:
                 #print(f'\n{m_ent}')
                 for ent_idx, ent in ent_dict.copy().items():
@@ -323,8 +358,19 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                         #print(f'FOUND MATCH for kept ent {ent_idx}')
                         ent_dict[ent_idx] += [m_ent[1]]
                         merged_ents.remove(m_ent)
+
             #print(f'# merged_ents: {len(merged_ents)}')
 
+            # QC to ensure you dont enter an infinite loop
+            if len(merged_ents) == pre_num_merged:
+                error_str = """
+                Failed to find a match this cycle and entering infi loop.
+                This is most likely due to having identical crossings in an entanglement with different chiralities.
+                This happens rarely when Topoly is confused about whether a crossing is real.
+                You can delete the entanglement or increase the density of the surface used in the Topoly package for the raw entanglement calculations.
+                """
+                raise ValueError(error_str)
+                
         print(f'\n### merge ents to final and reform ent_data')
         updated_ents = []
         for ent_idx, ent in ent_dict.items():
@@ -339,11 +385,19 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                 updated_ents += ent
 
         print(f'Results after adding those that got merged to each representative entanglement')
+        Step2b_QC_counter = 0
         for uent in updated_ents:
             print(uent)
+            Step2b_QC_counter += uent[0]
+
+        ## QC that the number of tracked entanglements after step 2a is still valid
+        print(f'Step2b_QC_counter: {Step2b_QC_counter} should = {num_raw_ents[chain]}')
+        if Step2b_QC_counter != num_raw_ents[chain]:
+            raise ValueError(f'The number of tracked entaglements after Step 2b {Step2b_QC_counter} != {num_raw_ents[chain]}')        
 
         ent_data[chain] = updated_ents
 
+### STEP 3 ################################################################################################################
     # Step 3
     print(f'\n# Step 3')
     for chain, processed_ents in ent_data.items():
@@ -420,9 +474,17 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
     
     print(f'Step 3 results')
     for chain, ents in ent_data.items():
+        Step3_QC_counter = 0
         for ent in ents:
             print(ent)
+            Step3_QC_counter += ent[0]
+        
+        # QC to ensure number of raw ents was preserved after step 3
+        print(f'Step3_QC_counter: {Step3_QC_counter} should = {num_raw_ents[chain]}')
+        if Step3_QC_counter != num_raw_ents[chain]:
+            raise ValueError(f'The number of tracked entaglements after Step 3 {Step3_QC_counter} != {num_raw_ents[chain]}')    
 
+### STEP 4 SPATIAL CLUSTERING ################################################################################################################
     # Step 4 prep
     print(f'\n# Step 4 prep')
     for chain, new_ents in ent_data.items():
@@ -438,11 +500,6 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
             full_entanglement_data[chain_num_chirality_key].append(ent)
 
     reset_counter = []
-
-    print(f'# Step 4 prep results')
-    for chain, ents in full_entanglement_data.items():
-        for ent in ents:
-            print(ent)
 
     # Step 4
     print(f'\n# Step 4')
@@ -579,7 +636,28 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                 rep_chain_ent[f"{chain}_{split_cluster_counter}"].append(ijr_values[0])
             
             split_cluster_counter += 1
+    
+    ## QC Step 4 results
+    print(f'Step 4 results')
+    num_raw_ents_FINAL = {}
+    for chain_counter, ijrs in rep_chain_ent.items():
+        print(chain_counter, ijrs)
 
+        chain, counter = chain_counter.split("_")
+        if chain not in num_raw_ents_FINAL:
+            num_raw_ents_FINAL[chain] = 0
+
+        for ijr in ijrs:
+
+            num_nc = int(ijr[0])
+            num_raw_ents_FINAL[chain] += num_nc
+
+    ## check the final tracking of raw ents
+    for chain, count in num_raw_ents.items():
+        if count != num_raw_ents_FINAL[chain]:
+            raise ValueError(f'The FINAL # of raw ents {num_raw_ents_FINAL[chain]} != the starting {count} for chain {chain}')
+        
+### STEP 5 OUTPUT FILE ################################################################################################################
     # Step 5
     print(f'\nStep 5: Output file')
     with open(outfile, "w") as f:
@@ -611,6 +689,7 @@ def cluster_entanglements(GE_file_w_cutoff: tuple):
                 print(line)
                 f.write(f"{line}\n")
     print(f'SAVED: {outfile}')
+
     return rep_chain_ent
 
 
