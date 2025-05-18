@@ -115,46 +115,82 @@ Clone this repository to your local machine:
 git clone https://github.com/yourusername/protein-entanglement-clustering.git
 cd protein-entanglement-clustering
 ```
+### Calculate Entanglements  
 
-## Usage
+```sh
+usage: gaussian_entanglement.py [-h] --PDB PDB [--GLN_threshold GLN_THRESHOLD] [--Calpha CALPHA] [--topoly_density TOPOLY_DENSITY]
+
+Process user specified arguments
+
+options:
+  -h, --help            show this help message and exit
+  --PDB PDB             Path to PDB file you want to generate raw entanglments for
+  --GLN_threshold GLN_THRESHOLD
+                        Threshold applied to the absoluate value of the GLN to determine if an entanglement is present
+  --Calpha CALPHA       use CA 8A cutoff instead of defualt 4.5A heavy atom cutoff for native contacts
+  --topoly_density TOPOLY_DENSITY
+                        Density of the triangulation of minimal loop surface for determining pericing. Default=0 to speed up calculations but might cause unrealistic crossings in AF structures with large disorderd loops. Increase to 1 if that is the case
+
+python codes/gaussian_entanglement.py --PDB test_pdbs/P0AD61_4YNG_C.pdb --GLN_threshold 0.6 --Calpha False
+
+# outputs 
+File containing 1 entanglement per line separated by "|".  
+[0] ChainID  
+[1] (loop native contact residue i, loop native contact residue j, crossings) representaive entanglement for the cluster  
+[2] Gn  
+[3] Gc  
+[4] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A)  
+
+>> cat unmapped_GE/P0AD61_4YNG_C_GE.txt 
+... Chain C | (22, 322, ['+8']) | 0.8296320600313153 | 0.013503444865087984 | CCbond-False
+... Chain C | (23, 315, ['+7']) | 0.7708439185980739 | -0.18254829395449138 | CCbond-False
+... Chain C | (23, 321, ['+8']) | 0.7428222270205512 | -0.007883120384376899 | CCbond-False
+... Chain C | (23, 325, ['+8']) | 0.7807704022915948 | 0.06370503083496538 | CCbond-False
+... Chain C | (26, 322, ['+7']) | 0.7933404875751218 | 0.008571405198053094 | CCbond-False
+... Chain C | (26, 325, ['+7']) | 0.8131075079148495 | 0.04511966185215608 | CCbond-False
+... Chain C | (26, 326, ['+7']) | 0.8061808737093675 | 0.07027379918067551 | CCbond-False
+... Chain C | (26, 329, ['+7']) | 0.8141865694700633 | 0.059135343521623585 | CCbond-False
+... Chain C | (27, 325, ['+7']) | 0.7027640703697804 | 0.0753421886303243 | CCbond-False
+... Chain C | (28, 325, ['+7']) | 0.6459508163972623 | 0.10311648477073058 | CCbond-False
+... Chain C | (382, 460, ['+375']) | 0.754121664338647 | 0 | CCbond-False
+... Chain C | (383, 462, ['+375']) | 0.875269225810889 | 0 | CCbond-False
+... Chain C | (387, 452, ['+374']) | 0.8668926428053635 | -0.060682253831032706 | CCbond-False
+```
 
 ### Clustering Entanglements
 
-Cluster non-covalent lasso entanglements in protein structures.
-
-```python
-from your_script import cluster_entanglements
-
-# Example usage
-result = cluster_entanglements(('path/to/unmapped_GE_file.txt', 57))
-```
-
-### Command Line Interface
-
-You can also use the provided command line interface:
-
 ```sh
-python codes/clustering.py -o clustered_unmapped_GE_HQ/Human_no_pure_slipknots/ --prot_unmapped_GE_file unmapped_GE_HQ/Human_no_pure_slipknots/Q9NR16_AF_A_GE.txt --organism Human
-```
--o is the output directory  
-  
---prot_unmapped_GE_file is the path to the raw entanglement file  
-  
---organism is the organism you want to use which is either Human, Ecoli, or Yeast  
+usage: clustering.py [-h] --rawENT RAWENT --name NAME [--outdir OUTDIR] [--organism ORGANISM]
 
-## Output
+Process user specified arguments
 
-### Raw entanglement file
+options:
+  -h, --help           show this help message and exit
+  --rawENT RAWENT      Path to raw entanglement file
+  --name NAME              An id for the output filename
+  --outdir OUTDIR      Output directory for the clustering results
+  --organism ORGANISM  Organism to be used for the clustering, Ecoli or Human or Yeast
 
+python codes/clustering.py --rawENT unmapped_GE/P0AD61_4YNG_C_GE.txt --name P0AD61_4YNG_C --organism Ecoli --outdir ./Clustered_GE/ 
+
+# outputs 
 File containing 1 entanglement per line separated by "|".  
 [0] ChainID  
 [1] (loop native contact residue i, loop native contact residue j, crossings) representaive entanglement for the cluster  
 [2] Gn  
 [3] Gc  
 [4] number of loop closing contacts  
-[4] ";" separated list of the residueIDs for the loop closing contacts  
-[4] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A)  
- 
+[5] ";" separated list of the residueIDs for the loop closing contacts  
+[6] Whether a disulfide bond was identified in one of the loop forming native contact (two SG atoms within 2.2 A)  
+  
+>> cat Clustered_GE/P0AD61_4YNG_C_Clustered_GE.txt
+... ID|i|j|c|gn|gc|num_contacts|contacts|CCBond
+... Chain C |23|315|+7|0.77084|-0.18255|10|23-315;26-322;26-325;26-326;26-329;27-325;28-325;22-322;23-321;23-325|False
+... Chain C |387|452|+374|0.86689|-0.06068|3|387-452;382-460;383-462|False  
+```
+  
+## Output
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.

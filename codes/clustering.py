@@ -782,7 +782,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Process user specified arguments")
     parser.add_argument("--rawENT", type=str, required=True, help="Path to raw entanglement file")
-    parser.add_argument("--ID", type=str, required=True, help="An id for the PDB to be analyzed")
+    parser.add_argument("--name", type=str, required=True, help="An id for the PDB to be analyzed")
     parser.add_argument("--outdir", type=str, default='./Clustered_GE', help="Output directory for the clustering results")
     parser.add_argument("--organism", type=str, default='Ecoli', help="Organism to be used for the clustering, Ecoli or Human or Yeast")
     args = parser.parse_args()
@@ -790,12 +790,12 @@ if __name__ == "__main__":
 
     # parse some of the default parameters
     rawENT = args.rawENT
-    ID = args.ID
+    name = args.name
     organism = args.organism
     outdir = args.outdir
     
     print(f'rawENT: {rawENT}')
-    print(f'ID: {ID}')
+    print(f'name: {name}')
     print(f'organism: {organism}')
     print(f'outdir: {outdir}')
     
@@ -804,7 +804,7 @@ if __name__ == "__main__":
     print(clustering)
 
     ## Cluster the native entanglements
-    nativeClusteredEnt = clustering.Cluster_NativeEntanglements(rawENT, outdir=outdir, outfile=f'{ID}_Clustered_GE.txt')
+    nativeClusteredEnt = clustering.Cluster_NativeEntanglements(rawENT, outdir=outdir, outfile=f'{name}_Clustered_GE.txt')
     print(nativeClusteredEnt)
 
     print(f'NORMAL TERMINATION')

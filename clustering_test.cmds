@@ -1,12 +1,12 @@
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/AF-Q9ZNE0-F1-model_v4_GE.txt -o clustered_unmapped_GE/ --organism Ecoli > logs/clustering_AF-Q9ZNE0_Calpha-False.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P0AD61_4YNG_C_GE.txt -o clustered_unmapped_GE/ --organism Ecoli > logs/clustering_P0AD61_Calpha-False.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P28631_1JR3_E_GE.txt -o clustered_unmapped_GE/ --organism Ecoli > logs/clustering_P28631_Calpha-False.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P38054_3NE5_A_GE.txt -o clustered_unmapped_GE/ --organism Ecoli > logs/clustering_P38054_Calpha-False.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/P38894-2XJP_A_GE.txt -o clustered_unmapped_GE/ --organism Yeast > logs/clustering_P38894_Calpha-False.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE/A0A075B6I1_GE.txt -o clustered_unmapped_GE/ --organism Human > logs/clustering_A0A075B6I1_Calpha-False.log
-
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE_CA/AF-Q9ZNE0-F1-model_v4_GE.txt -o clustered_unmapped_GE_CA/ --organism Ecoli > logs/clustering_AF-Q9ZNE0_Calpha-True.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE_CA/P0AD61_4YNG_C_GE.txt -o clustered_unmapped_GE_CA/ --organism Ecoli > logs/clustering_P0AD61_Calpha-True.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE_CA/P28631_1JR3_E_GE.txt -o clustered_unmapped_GE_CA/ --organism Ecoli > logs/clustering_P28631_Calpha-True.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE_CA/P38054_3NE5_A_GE.txt -o clustered_unmapped_GE_CA/ --organism Ecoli > logs/clustering_P38054_Calpha-True.log
-python codes/clustering.py --prot_unmapped_GE_file unmapped_GE_CA/P38894-2XJP_A_GE.txt -o clustered_unmapped_GE/ --organism Yeast > logs/clustering_P38894_Calpha-True.log
+python codes/clustering.py --rawENT unmapped_GE/AF-P12684-F1-model_v4_GE.txt --name AF-P12684-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-Q06538-F1-model_v4_GE.txt --name AF-Q06538-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P33413-F1-model_v4_GE.txt --name AF-P33413-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P37296-F1-model_v4_GE.txt --name AF-P37296-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P12685-F1-model_v4_GE.txt --name AF-P12685-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P39524-F1-model_v4_GE.txt --name AF-P39524-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-Q07660-F1-model_v4_GE.txt --name AF-Q07660-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P40501-F1-model_v4_GE.txt --name AF-P40501-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P53134-F1-model_v4_GE.txt --name AF-P53134-F1-model_v4_GE --organism Yeast
+python codes/clustering.py --rawENT unmapped_GE/AF-P76399-F1-model_v4_GE.txt --name AF-P76399-F1-model_v4_GE --organism Ecoli
+python codes/clustering.py --rawENT unmapped_GE/AF-P75830-F1-model_v4_GE.txt --name AF-P75830-F1-model_v4_GE --organism Ecoli
+ python codes/clustering.py --rawENT unmapped_GE/P0AD61_4YNG_C_GE.txt --name P0AD61_4YNG_C --organism Ecoli
