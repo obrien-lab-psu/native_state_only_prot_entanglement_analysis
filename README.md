@@ -38,83 +38,6 @@ git clone https://github.com/yourusername/protein-entanglement-detection.git
 cd protein-entanglement-detection
 ```
 
-## Usage
-
-### Command Line Interface
-
-You can also use the provided command line interface:
-
-```sh
-python your_script.py --PDB path/to/pdb --GLN_threshold 0.6 --topoly_density 1 --Calpha False
-```
---PDB is the required path to the PDB file to analyze  
-  
---GLN_threshold is an optional parameter to vary the threshold we find real entanglements. Any entanglement with a absolute value of the GLN above this threshold will be used. Default = 0.6  
-  
---topoly_density is an optional parameter to vary the density of triangles when drawing the minimal loop surface to determine peircing events   
-  
---Calpha is a True or False optional parameter to use either 8A between alpha carbons for native contacts or 4.5A between heavy atoms (False, default)  
-  
-## Output
-
-### Raw entanglement file
-
-File containing 1 entanglement per line separated by "|".  
-[0] ChainID  
-[1] (loop native contact residue i, loop native contact residue j, crossings)  
-[2] Gn  
-[3] Gc  
-[4] Whether a disulfide bond was identified at the native contact (two SG atoms within 2.2 A)  
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
- 
- 
-# Protein Entanglement Clustering (clustering.py)
-
-This repository contains scripts for clustering non-covalent lasso entanglements in protein structures. The primary functionality includes calculating distances between entanglements, identifying minimal loops, and spatially clustering entanglements based on residue crossings and chiralities.
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Functions](#functions)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
-
-### Prerequisites
-
-Ensure you have the following Python packages installed:
-
-- `numpy`
-- `scipy`
-- `geom_median`
-- `collections`
-- `itertools`
-- `functools`
-
-You can install the required packages using:
-
-```sh
-pip install numpy scipy geom_median
-```
-
-### Cloning the Repository
-
-Clone this repository to your local machine:
-
-```sh
-git clone https://github.com/yourusername/protein-entanglement-clustering.git
-cd protein-entanglement-clustering
-```
 ### Calculate Entanglements  
 
 ```sh
@@ -155,6 +78,49 @@ File containing 1 entanglement per line separated by "|".
 ... Chain C | (382, 460, ['+375']) | 0.754121664338647 | 0 | CCbond-False
 ... Chain C | (383, 462, ['+375']) | 0.875269225810889 | 0 | CCbond-False
 ... Chain C | (387, 452, ['+374']) | 0.8668926428053635 | -0.060682253831032706 | CCbond-False
+```
+
+  
+ 
+ 
+# Protein Entanglement Clustering (clustering.py)
+
+This repository contains scripts for clustering non-covalent lasso entanglements in protein structures. The primary functionality includes calculating distances between entanglements, identifying minimal loops, and spatially clustering entanglements based on residue crossings and chiralities.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Functions](#functions)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Installation
+
+### Prerequisites
+
+Ensure you have the following Python packages installed:
+
+- `numpy`
+- `scipy`
+- `geom_median`
+- `collections`
+- `itertools`
+- `functools`
+
+You can install the required packages using:
+
+```sh
+pip install numpy scipy geom_median
+```
+
+### Cloning the Repository
+
+Clone this repository to your local machine:
+
+```sh
+git clone https://github.com/yourusername/protein-entanglement-clustering.git
+cd protein-entanglement-clustering
 ```
 
 ### Clustering Entanglements
